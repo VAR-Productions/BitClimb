@@ -5,11 +5,12 @@ let bg = {
         s: 100,
         l: 70,
     },
-    width: 600,
-    height: 600
+    width: 1000,
+    height: 500
 };
 
-const pixelSize = 10;
+const gravity = 0.1;
+const pixelSize = 3;
 
 let elements = [];
 let platforms = [];
@@ -18,13 +19,22 @@ let characters = [];
 function setup() {
     createCanvas(bg.width, bg.height);
     new Platform();
-    new Character();
+    player = new Character({
+        keys: {
+            left: 37,
+            right: 39,
+            jump: 38
+        }
+    });
 }
 function draw() {
     background(hslFromObj(bg.color));
-    for (let element of elements) {
-        element.draw();
+    for (let char of characters) {
+        char.draw();
     }
+    /*for (let element of elements) {
+        element.draw();
+    }*/
 }
 
 function hslFromObj(hsl) {
