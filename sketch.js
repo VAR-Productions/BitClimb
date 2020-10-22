@@ -15,31 +15,50 @@ let frameCount = 0;
 let elements = [];
 let platforms = [];
 let characters = [];
+let screenPixels = [];
+
+
+
 
 const ugray = [24, 24, 24];
 function setup() {
     frameRate(60);
     console.log(pixelDensity());
     createCanvas(bg.width, bg.height);
-    new Platform();
+    new Platform({
+        x: 80,
+        y: 80
+    });
+    for (let i = 0; i <= bg.height; i += pixelSize) {
+        screenPixelrow = [];
+        for (let j = 0; j <= bg.width; j += pixelSize) {
+            screenPixelrow.push(new Pixel({
+                x: j,
+                y: i,
+                color: hslFromObj(bg.color)
+            }))
+        }
+        screenPixels.push(screenPixelrow);
+    }
     
 }
 function draw() {
     background(hslFromObj(bg.color));
     frameCount++;
-    for (let char of characters) {
-        char.draw();
+    for (let row of screenPixels) {
+        for (let pixel of row) {
+            //console.log(pixel);
+            pixel.draw();
+        }
     }
-    for (let platform of platforms) {
-        platform.draw();
-    }
+    drawElems(platforms);
 }
 
 function hslFromObj(hsl) {
     return color('hsl(' + hsl.h + ', ' + hsl.s + '%, ' + hsl.l + '%)');
 }
 function mouseClicked() {
-    player = new Character({
+    /*player = new Character({
         keys: {
             left: 37,
             right: 39,
@@ -48,5 +67,15 @@ function mouseClicked() {
         x: mouseX,
         y: mouseY
     });
-    console.log(player);
+    console.log(player);*/
+    new Platform({
+        x: Math.round(mouseX/pixelSize),
+        y: Math.round(mouseY/pixelSize)
+    });
+}
+
+function drawElems(elems) {
+    for (let elem of elems) {
+        elem.draw();
+    }
 }

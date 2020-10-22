@@ -16,14 +16,15 @@ class Pixel {
 
 
 class Platform {
-    constructor() {
+    constructor(info) {
         elements.push(this);
         platforms.push(this);
         //this.x = random(100, 400);
         //this.y = random(100, 400);
-        this.x = 80 * pixelSize;
-        this.y = 106 * pixelSize;
-
+        //this.x = 80;
+        //this.y = 80;
+        this.x = info.x;
+        this.y = info.y;
         this.initGrid();
         console.log(this.pixels);
     }
@@ -64,9 +65,9 @@ class Platform {
     draw() {
         this.pixels = gridToPixels(this.grid, this.x, this.y);
         drawPixels(this.pixels);
-        if (frameCount % 4000 == 0) {
+        /*if (frameCount % 4000 == 0) {
             this.y -= pixelSize;
-        }
+        }*/
     }
     move() {
 
@@ -307,8 +308,8 @@ function gridToPixels(grid, x, y) {
                 //col = color(255, 0, 0);
             }
             pixelRow.push(new Pixel({
-                x: x + (pixelSize * j),
-                y: y + (pixelSize * i),
+                x: x + (j),
+                y: y + (i),
                 color: col
             }));
         }
@@ -330,6 +331,7 @@ function drawPixels(arr) {
     for (let pixelRow of arr) {
         for (let pixel of pixelRow) {
             pixel.draw();
+            //screenPixels[pixel.y][pixel.x].color = pixel.color;
         }
     }
 }
