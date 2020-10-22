@@ -14,24 +14,58 @@ class Pixel {
     }
 }
 
+
 class Platform {
     constructor() {
         elements.push(this);
         platforms.push(this);
         //this.x = random(100, 400);
         //this.y = random(100, 400);
-        this.x = 250;
-        this.y = 250;
-        let green = color(0, 140, 0);
-        let red = color(140, 0, 0);
-        this.grid = [];
-        this.pixels = gridToPixels(this.grid, this.x, this.y);
-        
+        this.x = 80 * pixelSize;
+        this.y = 106 * pixelSize;
+
+        this.initGrid();
         console.log(this.pixels);
     }
+    initGrid() {
+        let green = color(0, 140, 0);
+        let red = color(140, 0, 0);
+        let gray1 = color(ugray);
+        let grass = function () {
+            return hslFromObj({
+                h: 100,
+                s: 100,
+                l: Math.round(random(10, 40))
+            });
+        };
+        let dirt = function () {
+            return hslFromObj({
+                h: 25,
+                s: 44,
+                l: Math.round(random(10, 30))
+            })
+        }
+        let gridArrays = [[0, 0], [gray1, gray1], [gray1, gray1], [gray1, gray1], [gray1, gray1], [0, 0]];
+        let textures = [grass, dirt];
+        for (let i = 0; i < 40; i++) {
+            gridArrays[0].splice(gridArrays[0].length - 1, 0, gray1);
+            gridArrays[1].splice(gridArrays[1].length - 1, 0, grass());
+            gridArrays[2].splice(gridArrays[2].length - 1, 0, textures[Math.round(random())]());
+            gridArrays[3].splice(gridArrays[3].length - 1, 0, dirt());
+            gridArrays[4].splice(gridArrays[4].length - 1, 0, dirt());
+            gridArrays[5].splice(gridArrays[5].length - 1, 0, gray1);
+        }
+        this.grid = gridArrays;
+        this.pixels = gridToPixels(this.grid, this.x, this.y);
+    }
+    updateGrid() {
+
+    }
     draw() {
-        for (let pixel of this.pixels) {
-            pixel.draw();
+        this.pixels = gridToPixels(this.grid, this.x, this.y);
+        drawPixels(this.pixels);
+        if (frameCount % 4000 == 0) {
+            this.y -= pixelSize;
         }
     }
     move() {
@@ -45,20 +79,21 @@ class Character {
         characters.push(this);
         //this.x = random(100, 400);
         //this.y = random(100, 400);
-        this.x = 250;
-        this.y = 100;
+        //this.x = 25 * pixelSize;
+        //this.y = 15 * pixelSize;
+        console.log(info);
+        this.x = info.x;
+        this.y = info.y;
+        console.log(info.x);
         this.dir = 'left';
         this.robeHue = random(0, 360);
         this.eyesClosed = false;
         this.keys = info.keys;
         this.currentRobeLength = 'short';
         this.xspeed = 1;
-        this.robeCount = 0;
+        this.yspeed = 1;
         this.robeMoveSpeed = 10;
-        this.blinkCount = 0;
         this.currentHoodState = 'open';
-        this.jumpGrowth = 0;
-        this.jumpBool = true;
         this.initGrid();
         console.log(this.pixels);
     }
@@ -66,7 +101,7 @@ class Character {
         let green = color(0, 140, 0);
         let red = color(140, 0, 0);
         let black = color(0);
-        let gray1 = color(24, 24, 24);
+        let gray1 = color(ugray);
         let gray2 = color(54, 54, 54);
         let gray3 = color(66, 66, 66);
         let robe1 = hslFromObj({
@@ -97,22 +132,22 @@ class Character {
         this.robeLenghts = {
             short: {},
             medium: {
-                19: [0, 0, gray1, brown2, brown2, brown2, gray1, gray2, gray1, brown2, brown2, 
+                19: [0, 0, gray1, brown2, brown2, brown2, gray1, gray2, gray1, brown2, brown2,
                     brown2, gray1, gray2, gray2, gold1, robe1, robe1, robe1, robe1, gray1, 0],
-                20: [0, gray1, brown1, brown1, brown1, brown1, gray1, gray2, gray1, brown1, 
+                20: [0, gray1, brown1, brown1, brown1, brown1, gray1, gray2, gray1, brown1,
                     brown1, brown1, gray1, gray2, gray3, gray2, gold1, gold1, robe1, robe1, robe1, gray1],
-                21: [0, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, 
+                21: [0, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1,
                     gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1]
             },
             long: {
                 17: [0, 0, gray1, gray3, gray3, gray3, gray3, gray3, gray3, gray3, gray3, gray3, gray3, gray2, gold1, robe2, robe1, robe1, robe1, gray1, 0, 0],
-                18: [0, 0, gray1, gray1, gray1, gray1, gray2, gray3, gray1, gray1, gray1, 
-                gray1, gray2, gray2, gold1, robe1, robe1, robe1, robe1, robe1, gray1, 0],
-                19: [0, 0, gray1, brown2, brown2, brown2, gray1, gray2, gray1, brown2, brown2, 
+                18: [0, 0, gray1, gray1, gray1, gray1, gray2, gray3, gray1, gray1, gray1,
+                    gray1, gray2, gray2, gold1, robe1, robe1, robe1, robe1, robe1, gray1, 0],
+                19: [0, 0, gray1, brown2, brown2, brown2, gray1, gray2, gray1, brown2, brown2,
                     brown2, gray1, gray2, gray2, gold1, robe1, robe1, robe1, robe1, robe1, gray1, gray1, 0],
-                20: [0, gray1, brown1, brown1, brown1, brown1, gray1, gray2, gray1, brown1, 
+                20: [0, gray1, brown1, brown1, brown1, brown1, gray1, gray2, gray1, brown1,
                     brown1, brown1, gray1, gray2, gray3, gray2, gold1, gold1, robe1, robe1, robe1, robe1, robe1, gray1],
-                21: [0, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, 
+                21: [0, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1,
                     gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1]
             }
         };
@@ -122,7 +157,7 @@ class Character {
                 4: [0, 0, 0, 0, gray1, robe1, robe1, robe1, robe1, robe1, robe2, robe2, robe2, robe2, robe1, gray1, robe1, gray1, 0, 0, 0],
                 5: [0, 0, 0, 0, gray1, robe1, robe1, robe1, robe1, robe2, robe2, robe2, robe2, robe1, robe1, gray1, gray1, robe1, gray1, 0, 0],
                 6: [0, 0, 0, gray1, robe1, robe1, robe1, robe1, robe2, robe2, robe2, robe2, robe2, robe1, robe1, robe1, gray1, gray1, gray1, 0, 0],
-                7: [0, 0, 0, gray1, robe1, gold1,gold1, gold1, gold1, gold1, gold1, gold1, robe2, robe1, robe1, robe1, gray1, 0, 0, 0, 0],
+                7: [0, 0, 0, gray1, robe1, gold1, gold1, gold1, gold1, gold1, gold1, gold1, robe2, robe1, robe1, robe1, gray1, 0, 0, 0, 0],
                 8: [0, 0, 0, gray1, gold1, black, eyes, black, black, eyes, black, black, gold1, robe1, robe1, robe1, robe1, gray1, 0, 0, 0],
             }
         }
@@ -145,13 +180,13 @@ class Character {
             [gray1, gray1, gray1, gray2, gray2, gray2, gray2, gray2, gray2, gray2, gray2, gray2, gray2, gold1, robe2, robe2, robe1, gray1, 0, 0, 0],
             [0, 0, gray1, brown3, brown3, brown3, gold2, gold2, brown3, brown3, brown3, brown3, brown3, brown3, gold1, robe2, robe1, robe1, gray1, 0, 0],
             [0, 0, gray1, gray3, gray3, gray3, gray3, gray3, gray3, gray3, gray3, gray3, gray3, gray2, gold1, robe2, robe1, robe1, gray1, 0, 0],
-            [0, 0, gray1, gray1, gray1, gray1, gray2, gray3, gray1, gray1, gray1, 
+            [0, 0, gray1, gray1, gray1, gray1, gray2, gray3, gray1, gray1, gray1,
                 gray1, gray2, gray2, gold1, robe1, robe1, robe1, robe1, gray1, 0],
-            [0, 0, gray1, brown2, brown2, brown2, gray1, gray2, gray1, brown2, brown2, 
+            [0, 0, gray1, brown2, brown2, brown2, gray1, gray2, gray1, brown2, brown2,
                 brown2, gray1, gray2, gray2, gold1, robe1, robe1, robe1, gray1, 0],
-            [0, gray1, brown1, brown1, brown1, brown1, gray1, gray2, gray1, brown1, 
+            [0, gray1, brown1, brown1, brown1, brown1, gray1, gray2, gray1, brown1,
                 brown1, brown1, gray1, gray2, gray3, gray2, gold1, gold1, robe1, robe1, gray1],
-            [0, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, 
+            [0, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1,
                 gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1, gray1]
         ];
         let newGrid = this.grid.map((x) => x);
@@ -174,14 +209,15 @@ class Character {
         this.pixels = gridToPixels(newGrid, this.x, this.y);
     }
     draw() {
+        drawPixels(this.pixels);
         if (keyIsDown(this.keys.left)) {
             this.dir = 'left';
             this.initGrid();
-            this.move(-1*this.xspeed);
+            this.xMove(-1);
         } else if (keyIsDown(this.keys.right)) {
             this.dir = 'right';
             this.initGrid();
-            this.move(this.xspeed);
+            this.xMove(1);
         } else {
             this.currentRobeLength = 'short';
             this.initGrid();
@@ -189,22 +225,25 @@ class Character {
         if (keyIsDown(this.keys.jump)) {
             this.jump();
         }
-        if (!this.jumpBool) {
-            this.jumpGrowth += 0.2;
+        if (this.platformContact()) {
+            this.yspeed = 0;
+        } else {
         }
-        this.blinkCount++;
-        if (this.blinkCount > 200) {
+        if (frameCount % 200 == 0) {
             this.blink();
-            this.blinkCount = 0;
         }
-        this.y += this.jumpGrowth;
-        for (let pixel of this.pixels) {
-            pixel.draw();
-        }
+        //console.log(frameCount % this.yspeed);
+        this.yMove();
     }
-    move(growth) {
-        this.x += growth * pixelSize;
+    xMove(dir) {
+        this.x += dir * this.xspeed * pixelSize;
         this.robeMove();
+    }
+    yMove() {
+        this.y += this.yspeed * pixelSize;
+        this.yspeed += 0.1;
+        //console.log(Math.round(this.yspeed));
+        //console.log(frameCount % Math.round(this.yspeed));
     }
     shiftEyes() {
         this.eyesClosed = !this.eyesClosed;
@@ -213,7 +252,7 @@ class Character {
     blink() {
         this.shiftEyes();
         let ths = this;
-        setTimeout(function() {
+        setTimeout(function () {
             ths.shiftEyes();
         }, 300);
     }
@@ -231,13 +270,6 @@ class Character {
     }
     robeMove() {
         this.currentRobeLength = 'medium';
-        /*if (this.robeCount > this.robeMoveSpeed) {
-            this.currentRobeLength = 'medium';
-        }
-        if (this.robeCount > this.robeMoveSpeed * 2) {
-            this.robeCount = 0;
-        }
-        this.robeCount++;*/
     }
     applyGridChange(grid, options, change) {
         for (let i = 0; i < Object.keys(options[change]).length; i++) {
@@ -246,10 +278,19 @@ class Character {
         return grid;
     }
     jump() {
-        if (this.jumpBool) {
-            this.jumpGrowth = -1 * pixelSize;
-            this.jumpBool = false;
-            this.initGrid();
+        
+    }
+    platformContact() {
+        for (let platform of platforms) {
+            let bottomY = this.pixels[this.pixels.length - 1][0].y;
+            let leftX = this.pixels[this.pixels.length - 1][0].x;
+            let rightX = this.pixels[this.pixels.length - 1][this.pixels[this.pixels.length - 1].length-1].x;
+            let pfLeftX = platform.x;
+            let pfRightX = platform.pixels[0][platform.pixels[0].length - 1].x;
+            if (bottomY >= platform.y && leftX < pfRightX && rightX > pfLeftX) {
+                this.y -= bottomY - platform.y;
+                return true;
+            }
         }
     }
 }
@@ -257,6 +298,7 @@ class Character {
 function gridToPixels(grid, x, y) {
     let pixels = [];
     for (let i = 0; i < grid.length; i++) {
+        let pixelRow = [];
         for (let j = 0; j < grid[i].length; j++) {
             if (grid[i][j]) {
                 col = grid[i][j];
@@ -264,12 +306,13 @@ function gridToPixels(grid, x, y) {
                 col = color(0, 0, 0, 0);
                 //col = color(255, 0, 0);
             }
-            pixels.push(new Pixel({
+            pixelRow.push(new Pixel({
                 x: x + (pixelSize * j),
                 y: y + (pixelSize * i),
                 color: col
             }));
         }
+        pixels.push(pixelRow);
     }
     return pixels;
 }
@@ -282,4 +325,11 @@ function maxArrayInArray(array) {
         }
     }
     return max;
+}
+function drawPixels(arr) {
+    for (let pixelRow of arr) {
+        for (let pixel of pixelRow) {
+            pixel.draw();
+        }
+    }
 }
